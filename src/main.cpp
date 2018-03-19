@@ -8,6 +8,7 @@
 #include "visual/Window.h"
 #include "visual/Model.h"
 #include "visual/Shader.h"
+#include "visual/Renderer.h"
 
 using glm::vec3;
 
@@ -26,30 +27,53 @@ void MessageCallback( GLenum source,
 
 int main(){
     Window window;
+    Renderer renderer;
 
     glEnable( GL_DEBUG_OUTPUT );
     glDebugMessageCallback( (GLDEBUGPROC) MessageCallback, 0 );
 
     Shader basicShader("basic");
-    basicShader.use();
 
     std::vector<Vertex> vertices = {
-            Vertex{vec3(-0.5f, -0.5f, 0.0f),vec3(1.0f, 0.0f, 0.0f)},
-            Vertex{vec3(0.5f, -0.5f, 0.0f),vec3(0.0f, 1.0f, 0.0f)},
-            Vertex{vec3(0.0f, 0.5f, 0.0f),vec3(0.0f, 0.0f, 1.0f)},
+            Vertex{vec3(-1.0f, 0.0f, -1.0f),vec3(1.0f, 0.0f, 0.0f)},
+            Vertex{vec3(1.0f, 0.0f, -1.0f),vec3(0.0f, 1.0f, 0.0f)},
+            Vertex{vec3(0.0f, 0.0f, 1.0f),vec3(0.0f, 0.0f, 1.0f)},
+            Vertex{vec3(0.0f, 1.0f, 0.0f),vec3(1.0f, 1.0f, 1.0f)},
     };
     std::vector<uint> indices = {
-            0,1,2
+            0,1,2,
+            0,2,3,
+            0,1,3,
+            1,2,3
     };
-    Model test(vertices, indices);
-    test.bufferModel();
-    test.bindVertexArray();
+    Model test(&basicShader, vertices, indices);
 
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    bool running = true;
+    float rot = -180;
+    while(running) {
+        Uint32 updateStart = SDL_GetTicks();
 
-    window.update();
+        rot += 0.01;
+        if(rot > 180){
+            rot = -180;
+        }
 
-    SDL_Delay(50000);
+        renderer.startRendering();
+        renderer.renderModel(test, vec3(0.0f, 0.0f, -6.0f), rot, vec3(0.2f, 1.0f, 0.0f));
+        window.update();
+
+        SDL_Event event{};
+        while (SDL_PollEvent(&event) != 0) {
+            switch (event.type) {
+                case SDL_QUIT:
+                    running = false;
+                    break;
+            }
+        }
+        if (SDL_GetTicks() < updateStart + 10) {
+            SDL_Delay((updateStart + 10) - SDL_GetTicks());
+        }
+    }
 
 }
 

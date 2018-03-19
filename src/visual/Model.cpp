@@ -4,14 +4,16 @@
 
 #include "Model.h"
 
-Model::Model() {
+Model::Model(Shader* _shader) {
+    shader = _shader;
     isBuffered = false;
     glGenVertexArrays(1, &m_vertexArray);
     m_elementBuffer = 0;
     m_vertexBuffer = 0;
 }
 
-Model::Model(std::vector<Vertex> vertices, std::vector<uint> indices) : Model() {
+Model::Model(Shader* shader, std::vector<Vertex> vertices, std::vector<uint> indices)
+        : Model(shader) {
     setVertices(vertices);
     setIndices(indices);
 }
@@ -44,6 +46,7 @@ void Model::bufferModel() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size()*sizeof(uint), m_indices.data(), GL_STATIC_DRAW);
 
     isBuffered = true;
+    m_numberOfIndices = static_cast<int>(m_indices.size());
 }
 
 void Model::deleteBuffers() {
@@ -61,5 +64,9 @@ void Model::setVertices(const std::vector<Vertex> &vertices) {
 void Model::setIndices(const std::vector<uint> &indices) {
     isBuffered = false;
     Model::m_indices = indices;
+}
+
+int Model::getNumberOfIndices() const {
+    return m_numberOfIndices;
 }
 
