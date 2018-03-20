@@ -15,6 +15,7 @@ using glm::vec3;
 struct Vertex{
     vec3 position;
     vec3 color;
+    vec3 normal;
 };
 
 class Model {

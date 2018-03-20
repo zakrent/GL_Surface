@@ -9,6 +9,7 @@
 #include "visual/Model.h"
 #include "visual/Shader.h"
 #include "visual/Renderer.h"
+#include "world/World.h"
 
 using glm::vec3;
 
@@ -34,7 +35,7 @@ int main(){
 
     Shader basicShader("basic");
 
-    std::vector<Vertex> vertices = {
+    /*std::vector<Vertex> vertices = {
             Vertex{vec3(-1.0f, 0.0f, -1.0f),vec3(1.0f, 0.0f, 0.0f)},
             Vertex{vec3(1.0f, 0.0f, -1.0f),vec3(0.0f, 1.0f, 0.0f)},
             Vertex{vec3(0.0f, 0.0f, 1.0f),vec3(0.0f, 0.0f, 1.0f)},
@@ -46,20 +47,22 @@ int main(){
             0,1,3,
             1,2,3
     };
-    Model test(&basicShader, vertices, indices);
+    Model test(&basicShader, vertices, indices);*/
+    World world(vec3(0.0f,0.0f,200.0f), &basicShader);
 
     bool running = true;
-    float rot = -180;
+    float rot = -95;
     while(running) {
         Uint32 updateStart = SDL_GetTicks();
 
         rot += 0.01;
-        if(rot > 180){
+        if(rot > 180) {
             rot = -180;
         }
 
+        world.generateWorld(vec3(-10.0f,0.0f,-60.0f));
         renderer.startRendering();
-        renderer.renderModel(test, vec3(0.0f, 0.0f, -6.0f), rot, vec3(0.2f, 1.0f, 0.0f));
+        renderer.renderModel(world.m_model, world.m_position, rot, vec3(1.0f, 0.0f, 0.0f));
         window.update();
 
         SDL_Event event{};
