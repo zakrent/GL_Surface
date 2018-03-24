@@ -9,7 +9,7 @@
 
 class Window {
 public:
-    static const int WIDTH = 600;
+    static const int WIDTH = 1000;
     static const int HEIGHT = 600;
     SDL_Window* m_window;
     SDL_GLContext m_context;

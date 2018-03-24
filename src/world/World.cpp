@@ -5,7 +5,7 @@
 #include "World.h"
 #include <glm/gtc/noise.hpp>
 
-World::World(vec3 center, Shader *shader) : m_model(shader){
+World::World(vec3 center){
     indicesCalculated = false;
     generateWorld(center);
     updateModel();
@@ -27,8 +27,7 @@ void World::updateModel() {
     std::vector<uint> indices;
     for(int x = 0; x < worldSize; x++){
         for(int y = 0; y < worldSize; y++){
-            //vec3 color = vec3(2*m_heightMap[x][y], 0.6f, m_heightMap[x][y]);
-            vec3 color = vec3(0.0f, 1.0f, 0.0f);
+            vec3 color = vec3(0.33f, 0.49f, 0.27f);
             vec3 normal = getPerlinNoiseNormal(vec2(x*unitSize, y*unitSize), 0.5f);
             vertices.push_back(Vertex{vec3(x*unitSize, y*unitSize, m_heightMap[x][y]),
                                       color, normal});
@@ -54,20 +53,21 @@ void World::centerWorld(vec3 center) {
     m_position = center - vec3(0.5*sideLength, 0.5*sideLength, 0);
 }
 
-float World::getPerlinNoise(vec2 pos, float seed) {
-    return glm::perlin(vec3(pos.x, pos.y, seed)*0.1f)*5.0f;
+float World::getPerlinNoise(vec2 offset, float seed) {
+    vec2 pos = vec2(m_position.x, m_position.y);
+    return glm::perlin((vec3(pos,0.0f)+vec3(offset.x, offset.y, seed))*0.1f)*5.0f;
 }
 
-vec3 World::getPerlinNoiseNormal(vec2 pos, float seed) {
+vec3 World::getPerlinNoiseNormal(vec2 offset, float seed) {
     float dX = 0.1f;
     float dY = 0.1f;
-    float XDiff = (-getPerlinNoise(pos, seed)
-                       +getPerlinNoise(pos+vec2(dX, 0), seed));
-    float YDiff = (-getPerlinNoise(pos, seed)
-                       +getPerlinNoise(pos+vec2(0, dY), seed));
-    vec3 XGrad = vec3(dX, 0, XDiff);
-    vec3 YGrad = vec3(0, dY, YDiff);
-    vec3 normal = glm::normalize(glm::cross(XGrad, YGrad));
+    float XDiff = (-getPerlinNoise(offset+vec2(-dX, 0), seed)
+                       +getPerlinNoise(offset+vec2(dX, 0), seed));
+    float YDiff = (-getPerlinNoise(offset+vec2(0, -dY), seed)
+                       +getPerlinNoise(offset+vec2(0, dY), seed));
+    vec3 XSlopeVec = vec3(2*dX, 0, XDiff);
+    vec3 YSlopeVec = vec3(0, 2*dY, YDiff);
+    vec3 normal = glm::normalize(glm::cross(XSlopeVec, YSlopeVec));
     return normal;
 }
 

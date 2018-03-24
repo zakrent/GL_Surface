@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "Shader.h"
 #include <GL/glew.h>
+#include <iostream>
 
 
 Window::Window() {
@@ -21,7 +22,11 @@ Window::Window() {
     m_window = SDL_CreateWindow((char*)"OpenGL test!", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
     m_context = SDL_GL_CreateContext(m_window);
 
-    glewInit();
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        std::cerr<<"GLEW Error: " << glewGetErrorString(err) << "\n";
+        exit(1);
+    }
     glEnable(GL_DEPTH_TEST);
 }
 

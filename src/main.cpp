@@ -29,40 +29,26 @@ void MessageCallback( GLenum source,
 int main(){
     Window window;
     Renderer renderer;
+    renderer.setCameraPos(vec3(0.0f, 0.0f, 7.0f));
 
     glEnable( GL_DEBUG_OUTPUT );
     glDebugMessageCallback( (GLDEBUGPROC) MessageCallback, 0 );
 
-    Shader basicShader("basic");
-
-    /*std::vector<Vertex> vertices = {
-            Vertex{vec3(-1.0f, 0.0f, -1.0f),vec3(1.0f, 0.0f, 0.0f)},
-            Vertex{vec3(1.0f, 0.0f, -1.0f),vec3(0.0f, 1.0f, 0.0f)},
-            Vertex{vec3(0.0f, 0.0f, 1.0f),vec3(0.0f, 0.0f, 1.0f)},
-            Vertex{vec3(0.0f, 1.0f, 0.0f),vec3(1.0f, 1.0f, 1.0f)},
-    };
-    std::vector<uint> indices = {
-            0,1,2,
-            0,2,3,
-            0,1,3,
-            1,2,3
-    };
-    Model test(&basicShader, vertices, indices);*/
-    World world(vec3(0.0f,0.0f,200.0f), &basicShader);
+    World world(vec3(0.0f,0.0f,0.0f));
 
     bool running = true;
-    float rot = -95;
+    float offset = 0;
     while(running) {
         Uint32 updateStart = SDL_GetTicks();
 
-        rot += 0.01;
-        if(rot > 180) {
-            rot = -180;
-        }
+        offset += 2;
+        renderer.setCameraPos(vec3(offset, 0.0f, 0.0f));
+        world.generateWorld(renderer.getCameraPos()-vec3(-50.0f, 0.0f, 5.0f));
+        world.generateWorld(vec3(offset, 0.0f, 0.0f)-vec3(-50.0f, 0.0f, 5.0f));
+        world.updateModel();
 
-        world.generateWorld(vec3(-10.0f,0.0f,-60.0f));
-        renderer.startRendering();
-        renderer.renderModel(world.m_model, world.m_position, rot, vec3(1.0f, 0.0f, 0.0f));
+        renderer.registerModel(&world.m_model, world.m_position);
+        renderer.renderAll();
         window.update();
 
         SDL_Event event{};

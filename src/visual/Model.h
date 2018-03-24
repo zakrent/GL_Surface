@@ -27,7 +27,6 @@ class Model {
     int m_numberOfIndices;
 
 public:
-    Shader* shader;
     bool isBuffered;
     void bufferModel();
     void deleteBuffers();
@@ -38,8 +37,8 @@ public:
     void setVertices(const std::vector<Vertex> &m_vertices);
     void setIndices(const std::vector<uint> &m_indices);
 
-    Model(Shader* shader);
-    Model(Shader* shader, std::vector<Vertex> vertices, std::vector<uint> indices);
+    Model();
+    Model(std::vector<Vertex> vertices, std::vector<uint> indices);
     ~Model();
 };
 
